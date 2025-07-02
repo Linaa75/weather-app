@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
-    <div>
-      <ul>
+    <div className="header">
+      <ul className="header-menu">
         <li>
           <Link to="/WeatherDisplay">Weather</Link>
         </li>
         <li>
-          <Link to="/CitySelector">Map</Link>
+          <Link to="/Map">Map</Link>
         </li>
       </ul>
     </div>

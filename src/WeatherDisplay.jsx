@@ -76,20 +76,22 @@ export default function WeatherDisplay() {
             value={isCity}
             onChange={(e) => setIsCity(e.target.value)}
           />
-          <div className="data">
-            <div className="text-line">
-              <p>Temperature</p>
-              <p>Description</p>
-              <p>Humidity</p>
-              <p>Wind speed</p>
+          {debouncedCity && (
+            <div className="data">
+              <div className="text-line">
+                <p>Temperature</p>
+                <p>Description</p>
+                <p>Humidity</p>
+                <p>Wind speed</p>
+              </div>
+              <div className="measurement-line">
+                <p>{isTemperature}°C</p>
+                <p>{isDescription}</p>
+                <p>{isHumidity}%</p>
+                <p>{isWind} m/s</p>
+              </div>
             </div>
-            <div className="measurement-line">
-              <p>{isTemperature}°C</p>
-              <p>{isDescription}</p>
-              <p>{isHumidity}%</p>
-              <p>{isWind} m/s</p>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </>
