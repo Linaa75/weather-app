@@ -1,0 +1,71 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+body {
+  background-color: #04595b;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+.container {
+  background-color: #faf2e2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 50px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 450px;
+
+  h1 {
+    font-size: 3em;
+    color: #d2b128;
+  }
+
+  input {
+    border: 2px solid #d2b128;
+    border-radius: 12px;
+    height: 30px;
+    width: 80%;
+    padding-left: 15px;
+    font-size: 1em;
+    color: #d2b128;
+    outline: none;
+    margin-bottom: 20px;
+  }
+
+  .data {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 18px;
+    font-weight: 500;
+
+    .text-line {
+      color: #377668;
+    }
+
+    .measurement-line {
+      text-align: end;
+      color: #377668;
+    }
+  }
+}
