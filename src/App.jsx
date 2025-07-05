@@ -9,8 +9,9 @@ function App() {
       <BrowserRouter>
         <Header></Header>
         <Routes>
-          <Route path="/weatherDisplay" element={<WeatherDisplay />} />
-          <Route path="/map" element={<Map />} />
+          <Route path="/" element={<WeatherDisplay />} />
+          <Route path="/WeatherDisplay" element={<WeatherDisplay />} />
+          <Route path="/Map" element={<Map />} />
         </Routes>
       </BrowserRouter>
     </>

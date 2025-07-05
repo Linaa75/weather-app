@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ThreeDayForecast from "./ThreeDayForecast";
 
 export default function WeatherDisplay() {
   const [isTemperature, setIsTemperature] = useState("");
@@ -9,6 +10,8 @@ export default function WeatherDisplay() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCity, setIsCity] = useState("");
   const [debouncedCity, setDebouncedCity] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
   const apiKey = import.meta.env.VITE_API_KEY;
   const DEBOUNCE_DELAY = 1000;
@@ -25,10 +28,16 @@ export default function WeatherDisplay() {
 
   useEffect(() => {
     if (!debouncedCity) {
+      setLatitude(null);
+      setLongitude(null);
       setIsLoading(false);
+      setIsError("");
       return;
     }
+
     const weather = async () => {
+      setIsLoading(true);
+      setIsError("");
       try {
         const geoResponse = await fetch(
           `https://api.openweathermap.org/geo/1.0/direct?q=${debouncedCity}&limit=1&appid=${apiKey}`
@@ -36,14 +45,35 @@ export default function WeatherDisplay() {
         if (!geoResponse.ok) throw new Error(`Error! ${geoResponse.status}`);
 
         const geoData = await geoResponse.json();
+        const { lat, lon } = geoData[0];
+        setLatitude(lat);
+        setLongitude(lon);
+
         if (geoData.length === 0)
           throw new Error("City not found. Please check the spelling.");
+      } catch (error) {
+        setLatitude(null);
+        setLongitude(null);
+        setIsError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    weather();
+  }, [debouncedCity, apiKey]);
 
-        const { lat, lon } = geoData[0];
-
+  useEffect(() => {
+    if (latitude === null || longitude === null) {
+      return;
+    }
+    const fetchWeatherData = async () => {
+      setIsLoading(true);
+      setIsError("");
+      try {
         const weatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`
         );
+
         if (!weatherResponse.ok)
           throw new Error(`Error! ${weatherResponse.status}`);
         const weatherData = await weatherResponse.json();
@@ -53,13 +83,15 @@ export default function WeatherDisplay() {
         setIsHumidity(parseInt(weatherData.main.humidity));
         setIsWind(parseInt(weatherData.wind.speed));
       } catch (error) {
-        setIsError({ error });
+        setLatitude(null);
+        setLongitude(null);
+        setIsError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
-    weather();
-  }, [debouncedCity, apiKey]);
+    fetchWeatherData();
+  }, [latitude, longitude, apiKey]);
 
   return (
     <>
@@ -92,6 +124,15 @@ export default function WeatherDisplay() {
               </div>
             </div>
           )}
+          <div>
+            {debouncedCity && latitude !== null && longitude !== null && (
+              <ThreeDayForecast
+                lat={latitude}
+                lon={longitude}
+                apiKey={apiKey}
+              />
+            )}
+          </div>
         </div>
       )}
     </>
