@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ThreeDayForecast from "./ThreeDayForecast";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 
 export default function WeatherDisplay() {
   const [isTemperature, setIsTemperature] = useState("");
@@ -12,6 +13,11 @@ export default function WeatherDisplay() {
   const [debouncedCity, setDebouncedCity] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleForecast = () => {
+    setIsOpen(!isOpen);
+  };
 
   const apiKey = import.meta.env.VITE_API_KEY;
   const DEBOUNCE_DELAY = 1000;
@@ -94,47 +100,65 @@ export default function WeatherDisplay() {
   }, [latitude, longitude, apiKey]);
 
   return (
-    <>
+    <div className="flex justify-center items-center pr-10 pl-10 m-40 bg-sky-700 border rounded-2xl w-full">
       {isLoading ? (
-        <p>Loading ...</p>
+        <p className="m-auto text-white">Loading ...</p>
       ) : isError ? (
-        <p>{isError}</p>
+        <p className="m-auto text-white">{isError}</p>
       ) : (
-        <div className="container">
-          <h1>Check weather in your city!</h1>
-          <input
-            type="text"
-            placeholder="Enter your city"
-            value={isCity}
-            onChange={(e) => setIsCity(e.target.value)}
-          />
-          {debouncedCity && (
-            <div className="data">
-              <div className="text-line">
-                <p>Temperature</p>
-                <p>Description</p>
-                <p>Humidity</p>
-                <p>Wind speed</p>
+        <div className="flex flex-row items-center w-full gap-7">
+          <div className="flex-1 flex flex-col items-center p-7 justify-between">
+            <h1 className="text-5xl text-yellow-300 pt-10 pb-5 font-medium">
+              Check weather in your city!
+            </h1>
+            <input
+              className="border-2 border-yellow-300 rounded-xl p-1 pl-3 w-full text-yellow-300 text-lg outline-transparent"
+              type="text"
+              placeholder="Enter your city"
+              value={isCity}
+              onChange={(e) => setIsCity(e.target.value)}
+            />
+            {debouncedCity && (
+              <div className="flex pt-10 pb-10 flex-row justify-between text-lg text-sky-50 w-full">
+                <div className="flex flex-col">
+                  <p>Temperature</p>
+                  <p>Description</p>
+                  <p>Humidity</p>
+                  <p>Wind speed</p>
+                </div>
+                <div className="flex flex-col items-end">
+                  <p>{isTemperature}°C</p>
+                  <p>{isDescription}</p>
+                  <p>{isHumidity}%</p>
+                  <p>{isWind} m/s</p>
+                </div>
               </div>
-              <div className="measurement-line">
-                <p>{isTemperature}°C</p>
-                <p>{isDescription}</p>
-                <p>{isHumidity}%</p>
-                <p>{isWind} m/s</p>
-              </div>
-            </div>
-          )}
-          <div>
+            )}
             {debouncedCity && latitude !== null && longitude !== null && (
+              <button
+                className="text-center cursor-pointer p-3 mb-10 bg-gray-100 rounded-lg flex items-center"
+                onClick={toggleForecast}
+              >
+                3 Day Forecast
+                <span className="ml-2 inline-block transition-transform duration-300 transform">
+                  {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
+                </span>
+              </button>
+            )}
+          </div>
+
+          {isOpen &&
+            debouncedCity &&
+            latitude !== null &&
+            longitude !== null && (
               <ThreeDayForecast
                 lat={latitude}
                 lon={longitude}
                 apiKey={apiKey}
               />
             )}
-          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -7,12 +7,14 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Header></Header>
-        <Routes>
-          <Route path="/" element={<WeatherDisplay />} />
-          <Route path="/WeatherDisplay" element={<WeatherDisplay />} />
-          <Route path="/Map" element={<Map />} />
-        </Routes>
+        <div className="flex bg-sky-50 min-h-screen">
+          <Header></Header>
+          <Routes>
+            <Route path="/" element={<WeatherDisplay />} />
+            <Route path="/WeatherDisplay" element={<WeatherDisplay />} />
+            <Route path="/Map" element={<Map />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </>
   );

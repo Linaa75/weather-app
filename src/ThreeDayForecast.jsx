@@ -21,7 +21,7 @@ export default function ThreeDayForecast({ lat, lon, apiKey }) {
         const forecastSet = new Set();
 
         for (const item of forecastData.list) {
-          const date = new Date(item.dt_txt).toLocaleDateString("uk-UK", {
+          const date = new Date(item.dt_txt).toLocaleDateString("uk-en", {
             day: "numeric",
             month: "long",
           });
@@ -57,35 +57,39 @@ export default function ThreeDayForecast({ lat, lon, apiKey }) {
   return (
     <>
       {isLoading ? (
-        <p>Loading ...</p>
+        <p className="m-auto text-white">Loading ...</p>
       ) : isError ? (
-        <p>{isError}</p>
+        <p className="m-auto text-white">{isError}</p>
       ) : (
-        <div>
-          <h2 className="text-orange-950 text-center">3 Day Forecast</h2>
-          <div className="flex flex-row justify-between w-full">
-            {isForecast.length > 0 ? (
-              isForecast.map((day, index) => (
+        <div className="flex-1 pt-15 pb-15">
+          {isForecast.length > 0 && (
+            <div className="flex flex-col w-full pl-2 gap-5">
+              {isForecast.map((day, index) => (
                 <div
                   key={index}
-                  className="flex-1 bg-black shadow-md rounded-lg"
+                  className="flex flex-row items-center justify-between bg-white shadow-md rounded-lg p-5 text-center"
                 >
-                  <h3>{day.date}</h3>
-                  <p>Min: {day.tempMin}°C</p>
-                  <p>Max: {day.tempMax}°C</p>
+                  <h3 className="text-lg font-medium">{day.date}</h3>
                   <div>
+                    <p>Min: {day.tempMin}°C</p>
+                    <p>Max: {day.tempMax}°C</p>
+                  </div>
+                  <div className="flex justify-center">
                     <img
+                      className="mx-auto block"
                       src={`https://openweathermap.org/img/wn/${day.icon}.png`}
                     ></img>
                   </div>
                   <p>{day.description}</p>
                   <p>{day.wind}m/s</p>
                 </div>
-              ))
-            ) : (
-              <p>Weather is unavailable</p>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {isForecast.length === 0 && (
+            <p className="p-4 bg-gray-50 rounded-lg">Weather is unavailable</p>
+          )}
         </div>
       )}
     </>
