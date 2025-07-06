@@ -1,11 +1,11 @@
 import useWeatherForecast from "./useWeatherForecast";
 
-export default function ThreeDayForecast({ lat, lon, apiKey }) {
+export default function FiveDayForecast({ lat, lon, apiKey }) {
   const { isForecast, isLoading, isError } = useWeatherForecast(
     lat,
     lon,
     apiKey,
-    3
+    5
   );
 
   return (
@@ -16,8 +16,8 @@ export default function ThreeDayForecast({ lat, lon, apiKey }) {
         <p className="m-auto text-white">{isError}</p>
       ) : (
         <div className="flex-1">
-          {isForecast.length > 0 && (
-            <div className="flex flex-col w-full gap-5">
+          {isForecast.length > 0 ? (
+            <div className="flex flex-col w-full gap-5 pt-5 pb-5">
               {isForecast.map((day, index) => (
                 <div
                   key={index}
@@ -39,9 +39,7 @@ export default function ThreeDayForecast({ lat, lon, apiKey }) {
                 </div>
               ))}
             </div>
-          )}
-
-          {isForecast.length === 0 && (
+          ) : (
             <p className="p-4 bg-gray-50 rounded-lg">Weather is unavailable</p>
           )}
         </div>

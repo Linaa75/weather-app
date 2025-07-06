@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ThreeDayForecast from "./ThreeDayForecast";
+import FiveDayForecast from "./FiveDayForecast";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 
 export default function WeatherDisplay() {
@@ -8,19 +9,56 @@ export default function WeatherDisplay() {
   const [isHumidity, setIsHumidity] = useState("");
   const [isWind, setIsWind] = useState("");
   const [isError, setIsError] = useState("");
+  const [isGeoCurrentError, setIsGeoCurrentError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isCity, setIsCity] = useState("");
   const [debouncedCity, setDebouncedCity] = useState("");
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [activeForecastType, setActiveForecastType] = useState(null);
 
-  const toggleForecast = () => {
-    setIsOpen(!isOpen);
+  const toggleThreeForecast = () => {
+    setActiveForecastType((prevType) =>
+      prevType === "threeDay" ? null : "threeDay"
+    );
+  };
+  const toggleFiveForecast = () => {
+    setActiveForecastType((prevType) =>
+      prevType === "fiveDay" ? null : "fiveDay"
+    );
   };
 
   const apiKey = import.meta.env.VITE_API_KEY;
   const DEBOUNCE_DELAY = 1000;
+
+  useEffect(() => {
+    setIsLoading(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+          setIsLoading(false);
+          setIsGeoCurrentError("");
+        },
+        (error) => {
+          setIsGeoCurrentError("Automatically geolocation is unavailable");
+          setIsLoading(false);
+          setLatitude(null);
+          setLongitude(null);
+        }
+      );
+    } else {
+      setIsGeoCurrentError("Your browser does not support geolocation.");
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isCity) {
+      setIsGeoCurrentError("");
+    }
+  }, [isCity]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -92,6 +130,7 @@ export default function WeatherDisplay() {
         setLatitude(null);
         setLongitude(null);
         setIsError(error.message);
+        setActiveForecastType(null);
       } finally {
         setIsLoading(false);
       }
@@ -102,9 +141,7 @@ export default function WeatherDisplay() {
   return (
     <div className="flex justify-center items-center pr-10 pl-10 m-40 bg-sky-700 border rounded-2xl w-full">
       {isLoading ? (
-        <p className="m-auto text-white">Loading ...</p>
-      ) : isError ? (
-        <p className="m-auto text-white">{isError}</p>
+        <p className="m-auto text-sky-700">Loading ...</p>
       ) : (
         <div className="flex flex-row items-center w-full gap-7">
           <div className="flex-1 flex flex-col items-center p-7 justify-between">
@@ -118,36 +155,78 @@ export default function WeatherDisplay() {
               value={isCity}
               onChange={(e) => setIsCity(e.target.value)}
             />
-            {debouncedCity && (
-              <div className="flex pt-10 pb-10 flex-row justify-between text-lg text-sky-50 w-full">
-                <div className="flex flex-col">
-                  <p>Temperature</p>
-                  <p>Description</p>
-                  <p>Humidity</p>
-                  <p>Wind speed</p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <p>{isTemperature}°C</p>
-                  <p>{isDescription}</p>
-                  <p>{isHumidity}%</p>
-                  <p>{isWind} m/s</p>
-                </div>
-              </div>
+
+            {isGeoCurrentError && (
+              <p className="m-auto text-white">{isGeoCurrentError}</p>
             )}
-            {debouncedCity && latitude !== null && longitude !== null && (
-              <button
-                className="text-center cursor-pointer p-3 mb-10 bg-gray-100 rounded-lg flex items-center"
-                onClick={toggleForecast}
-              >
-                3 Day Forecast
-                <span className="ml-2 inline-block transition-transform duration-300 transform">
-                  {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
-                </span>
-              </button>
+            {!isGeoCurrentError &&
+              !isCity &&
+              latitude !== null &&
+              longitude !== null && (
+                <p className="text-sky-50 pt-5">
+                  Weather for your current geolocation
+                </p>
+              )}
+
+            {!isError &&
+              (debouncedCity ||
+                (latitude !== null && longitude !== null && !isCity)) && (
+                <div className="flex pt-10 pb-10 flex-row justify-between text-lg text-sky-50 w-full">
+                  <div className="flex flex-col">
+                    <p>Temperature</p>
+                    <p>Description</p>
+                    <p>Humidity</p>
+                    <p>Wind speed</p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <p>{isTemperature}°C</p>
+                    <p>{isDescription}</p>
+                    <p>{isHumidity}%</p>
+                    <p>{isWind} m/s</p>
+                  </div>
+                </div>
+              )}
+
+            {isError && !isLoading && (
+              <p className="m-auto text-white">{isError}</p>
             )}
+
+            <div className="flex flex-row justify-between w-full">
+              {debouncedCity && latitude !== null && longitude !== null && (
+                <button
+                  className="text-center cursor-pointer p-3 bg-gray-100 rounded-lg flex items-center"
+                  onClick={toggleThreeForecast}
+                >
+                  3-Day Forecast
+                  <span className="ml-2 inline-block transition-transform duration-300 transform">
+                    {activeForecastType === "threeDay" ? (
+                      <FaArrowLeft />
+                    ) : (
+                      <FaArrowRight />
+                    )}
+                  </span>
+                </button>
+              )}
+
+              {debouncedCity && latitude !== null && longitude !== null && (
+                <button
+                  className="text-center cursor-pointer p-3 bg-gray-100 rounded-lg flex items-center"
+                  onClick={toggleFiveForecast}
+                >
+                  5-Day Forecast
+                  <span className="ml-2 inline-block transition-transform duration-300 transform">
+                    {activeForecastType === "fiveDay" ? (
+                      <FaArrowLeft />
+                    ) : (
+                      <FaArrowRight />
+                    )}
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
 
-          {isOpen &&
+          {activeForecastType === "threeDay" &&
             debouncedCity &&
             latitude !== null &&
             longitude !== null && (
@@ -156,6 +235,12 @@ export default function WeatherDisplay() {
                 lon={longitude}
                 apiKey={apiKey}
               />
+            )}
+          {activeForecastType === "fiveDay" &&
+            debouncedCity &&
+            latitude !== null &&
+            longitude !== null && (
+              <FiveDayForecast lat={latitude} lon={longitude} apiKey={apiKey} />
             )}
         </div>
       )}
