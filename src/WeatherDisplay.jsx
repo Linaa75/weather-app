@@ -138,6 +138,12 @@ export default function WeatherDisplay() {
     fetchWeatherData();
   }, [latitude, longitude, apiKey]);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="flex justify-center items-center pr-10 pl-10 m-40 bg-sky-700 border rounded-2xl w-full">
       {isLoading ? (
@@ -154,6 +160,7 @@ export default function WeatherDisplay() {
               placeholder="Enter your city"
               value={isCity}
               onChange={(e) => setIsCity(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
 
             {isGeoCurrentError && (

@@ -1,20 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./Header";
 import WeatherDisplay from "./WeatherDisplay";
-import Map from "./Map";
+import AirPolution from "./AirPolution";
+import ThemeProvider from "./ThemeContext";
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <div className="flex bg-sky-50 min-h-screen">
-          <Header></Header>
-          <Routes>
-            <Route path="/" element={<WeatherDisplay />} />
-            <Route path="/WeatherDisplay" element={<WeatherDisplay />} />
-            <Route path="/Map" element={<Map />} />
-          </Routes>
-        </div>
+        <ThemeProvider>
+          <div className="flex bg-sky-50 min-h-screen dark:bg-gray-800">
+            <Header></Header>
+            <Routes>
+              <Route path="/" element={<WeatherDisplay />} />
+              <Route path="/WeatherDisplay" element={<WeatherDisplay />} />
+              <Route path="/AirPolution" element={<AirPolution />} />
+            </Routes>
+          </div>
+        </ThemeProvider>
       </BrowserRouter>
     </>
   );
